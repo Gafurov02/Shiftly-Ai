@@ -6,29 +6,34 @@ export default defineNuxtRouteMiddleware(
         const {
             data: { user }
         } =
-            await supabase
-                .auth
-                .getUser()
+            await supabase.auth.getUser()
 
         if (!user?.email) {
-            return navigateTo(
-                '/login'
-            )
+            return navigateTo('/login')
         }
 
         const {
-            data: employee
+            data: employee,
+            error
         } =
             await supabase
-                .from(
-                    'employees'
-                )
+                .from('employees')
                 .select('role')
                 .eq(
                     'email',
-                    user.email
+                    user.email.trim()
+                        .toLowerCase()
                 )
-                .single()
+                .maybeSingle()
+
+        console.log(
+            'ADMIN CHECK',
+            {
+                email: user.email,
+                employee,
+                error
+            }
+        )
 
         const allowed =
             employee?.role ===
