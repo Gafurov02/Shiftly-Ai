@@ -67,6 +67,7 @@ onMounted(async () => {
             status
         )
       })
+})
 
 onUnmounted(() => {
   if (channel) {
