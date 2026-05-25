@@ -14,7 +14,8 @@ type AdminDashboard = {
 }
 
 definePageMeta({
-  layout: 'mobile'
+  layout: 'mobile',
+  middleware: ['admin']
 })
 
 useHead({
@@ -433,10 +434,6 @@ const formatTime = (time?: string | null) => {
 
 onMounted(() => {
   void loadAdminData()
-})
-
-definePageMeta({
-  middleware: ['admin']
 })
 </script>
 
