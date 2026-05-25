@@ -50,7 +50,7 @@ export default defineNuxtConfig({
     devOptions: {
       enabled: true
     }
-  }
+  },
 
   supabase: {
     redirect: false
