@@ -43,25 +43,30 @@ onMounted(async () => {
   await loadFeed()
 
   channel = supabase
-      .channel(
-          'feed-realtime'
-      )
+      .channel('feed-realtime')
 
       .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table:
-                'announcements'
+            table: 'announcements'
           },
           async () => {
+            console.log(
+                'REALTIME UPDATE'
+            )
+
             await loadFeed()
           }
       )
 
-      .subscribe()
-})
+      .subscribe((status) => {
+        console.log(
+            'Realtime:',
+            status
+        )
+      })
 
 onUnmounted(() => {
   if (channel) {

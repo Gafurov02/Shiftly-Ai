@@ -1,48 +1,45 @@
 <script setup lang="ts">
 const route = useRoute()
 
-const navItems = [
-  {
-    name: 'Home',
-    icon: '🏠',
-    path: '/'
-  },
-  {
-    name: 'Schedule',
-    icon: '📅',
-    path: '/schedule'
-  },
-  {
-    name: 'AI',
-    icon: '✨',
-    path: '/ai'
-  },
-  {
-    name: 'Team',
-    icon: '💬',
-    path: '/team'
-  },
-  {
-    name: 'Profile',
-    icon: '👤',
-    path: '/profile'
-  },
-  {
-    name: 'Alerts',
-    icon: '🔔',
-    path: '/notifications'
-  },
-  {
-    name: 'Feed',
-    icon: '📢',
-    path: '/feed'
-  },
-  {
-    name: 'Admin',
-    icon: '🛠',
-    path: '/admin'
-  }
-]
+const navItems =
+    computed(() => [
+      {
+        name: 'Home',
+        icon: '🏠',
+        path: '/'
+      },
+      {
+        name: 'Schedule',
+        icon: '📅',
+        path: '/schedule'
+      },
+      {
+        name: 'AI',
+        icon: '✨',
+        path: '/ai'
+      },
+      {
+        name: 'Team',
+        icon: '💬',
+        path: '/team'
+      },
+      {
+        name: 'Profile',
+        icon: '👤',
+        path: '/profile'
+      },
+
+      ...(isAdmin.value ||
+      isManager.value
+          ? [
+            {
+              name: 'Admin',
+              icon: '🛠',
+              path: '/admin'
+            }
+          ]
+          : [])
+    ])
 
 const {
   isAdmin,
