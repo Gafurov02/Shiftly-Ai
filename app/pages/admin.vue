@@ -434,6 +434,10 @@ const formatTime = (time?: string | null) => {
 onMounted(() => {
   void loadAdminData()
 })
+
+definePageMeta({
+  middleware: ['admin']
+})
 </script>
 
 <template>

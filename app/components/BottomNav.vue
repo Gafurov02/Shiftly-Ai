@@ -45,6 +45,16 @@ const navItems = [
 ]
 
 const {
+  isAdmin,
+  isManager,
+  loadRole
+} = useRole()
+
+onMounted(() => {
+  loadRole()
+})
+
+const {
   unreadCount,
   startRealtime
 } = useNotifications()
