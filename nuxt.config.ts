@@ -23,8 +23,7 @@ export default defineNuxtConfig({
     manifest: {
       name: 'Shiftly AI',
       short_name: 'Shiftly',
-      description:
-        'Restaurant staff management',
+      description: 'Restaurant staff management',
 
       theme_color: '#050505',
       background_color: '#050505',
@@ -47,7 +46,15 @@ export default defineNuxtConfig({
     },
 
     workbox: {
-      navigateFallback: '/'
+      navigateFallback: '/',
+
+      globPatterns: [
+        '**/*.{js,css,html,png,svg,ico,json}'
+      ],
+
+      cleanupOutdatedCaches: true,
+      clientsClaim: true,
+      skipWaiting: true
     },
 
     devOptions: {
