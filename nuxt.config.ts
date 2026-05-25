@@ -30,7 +30,6 @@ export default defineNuxtConfig({
       background_color: '#050505',
 
       display: 'standalone',
-
       orientation: 'portrait',
 
       icons: [
@@ -47,8 +46,12 @@ export default defineNuxtConfig({
       ]
     },
 
+    workbox: {
+      navigateFallback: '/'
+    },
+
     devOptions: {
-      enabled: true
+      enabled: false
     }
   },
 
