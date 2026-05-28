@@ -5,7 +5,13 @@ type Employee = Database['public']['Tables']['employees']['Row']
 type Shift = Database['public']['Tables']['shifts']['Row']
 type Announcement = Database['public']['Tables']['announcements']['Row']
 type Notification = Database['public']['Tables']['notifications']['Row']
-type AdminTab = 'overview' | 'news' | 'shifts' | 'team' | 'alerts'
+type AdminTab =
+    'overview' |
+    'news' |
+    'shifts' |
+    'team' |
+    'alerts' |
+    'requests'
 type AdminDashboard = {
   employees: Employee[]
   shifts: Shift[]
@@ -32,6 +38,10 @@ const employees = ref<Employee[]>([])
 const shifts = ref<Shift[]>([])
 const announcements = ref<Announcement[]>([])
 const notifications = ref<Notification[]>([])
+
+const shiftRequests =
+    ref<ShiftRequest[]>([]
+    )
 
 const getLocalDate = () => {
   const date = new Date()
@@ -95,6 +105,16 @@ const tabs = computed(() => [
     id: 'alerts' as const,
     label: 'Alerts',
     count: notifications.value.filter(item => !item.is_read).length
+  },
+  {
+    id: 'requests' as const,
+    label: 'Requests',
+    count: shiftRequests.value
+        .filter(
+            item =>
+                item.status ===
+                'pending'
+        ).length
   }
 ])
 
@@ -165,6 +185,18 @@ const loadAdminData = async () => {
     shifts.value = data.shifts
     announcements.value = data.announcements
     notifications.value = data.notifications
+
+    const {
+      data: requests
+    } = await supabase
+        .from('shift_requests')
+        .select('*')
+        .order('created_at', {
+          ascending: false
+        })
+
+    shiftRequests.value =
+        requests || []
   } catch (error) {
     errorMessage.value = getErrorMessage(error)
   } finally {
@@ -424,6 +456,12 @@ const deleteNotification = async (id: string) => {
   )
 }
 
+type ShiftRequest =
+    Database['public']
+['Tables']
+    ['shift_requests']
+    ['Row']
+
 const formatTime = (time?: string | null) => {
   if (!time) {
     return '--:--'
@@ -431,6 +469,31 @@ const formatTime = (time?: string | null) => {
 
   return time.slice(0, 5)
 }
+
+const updateRequestStatus =
+    async (
+        id: string,
+        status:
+            'approved' |
+            'rejected'
+    ) => {
+      await runMutation(
+          async () => {
+            await supabase
+                .from(
+                    'shift_requests'
+                )
+                .update({
+                  status
+                })
+                .eq(
+                    'id',
+                    id
+                )
+          },
+          `Request ${status}`
+      )
+    }
 
 onMounted(() => {
   void loadAdminData()
@@ -462,6 +525,117 @@ onMounted(() => {
           Manage team updates, shifts, people and alerts.
         </p>
       </div>
+
+      <section
+          v-if="
+      activeTab ===
+      'requests'
+    "
+          class="mt-6 space-y-5"
+      >
+        <div
+            v-if="
+        !shiftRequests.length
+      "
+            class="glass-card
+      rounded-[28px]
+      p-5 text-center
+      text-zinc-500"
+        >
+          No requests yet
+        </div>
+
+        <div
+            v-for="request
+      in shiftRequests"
+            :key="request.id"
+            class="glass-card
+      rounded-[28px]
+      p-5"
+        >
+          <div
+              class="flex
+        items-start
+        justify-between"
+          >
+            <div>
+              <h3
+                  class="font-semibold"
+              >
+                {{
+                  request.type ===
+                  'day_off'
+                      ? '🏖 Day Off'
+                      : '🔄 Shift Swap'
+                }}
+              </h3>
+
+              <p
+                  class="mt-2
+            text-sm
+            text-zinc-400"
+              >
+                {{
+                  request.message
+                }}
+              </p>
+
+              <p
+                  class="mt-2
+            text-xs
+            text-zinc-600"
+              >
+                Status:
+                {{
+                  request.status
+                }}
+              </p>
+            </div>
+
+            <div
+                v-if="
+            request.status
+            ===
+            'pending'
+          "
+                class="flex
+          gap-2"
+            >
+              <button
+                  class="rounded-xl
+            bg-green-500/10
+            px-3 py-2
+            text-sm
+            text-green-300"
+                  @click="
+            updateRequestStatus(
+              request.id,
+              'approved'
+            )
+          "
+              >
+                Approve
+              </button>
+
+              <button
+                  class="rounded-xl
+            bg-red-500/10
+            px-3 py-2
+            text-sm
+            text-red-300"
+                  @click="
+            updateRequestStatus(
+              request.id,
+              'rejected'
+            )
+          "
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <button
           class="glass-card mt-1 h-11 w-11 rounded-2xl text-lg"
