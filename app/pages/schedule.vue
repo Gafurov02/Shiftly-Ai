@@ -216,6 +216,70 @@ const clockOut = async () => {
       'clock_out'
   )
 }
+
+const requestDayOff = async () => {
+  try {
+    const currentEmployee =
+        await getCurrentEmployee()
+
+    if (!currentEmployee) {
+      alert('Employee not found')
+      return
+    }
+
+    const { error } =
+        await supabase
+            .from('shift_requests')
+            .insert({
+              employee_id: currentEmployee.id,
+              type: 'day_off',
+              message: 'Requested day off'
+            })
+
+    console.log('DAY OFF ERROR', error)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    alert('✅ Day off request sent')
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const requestShiftSwap = async () => {
+  try {
+    const currentEmployee =
+        await getCurrentEmployee()
+
+    if (!currentEmployee) {
+      alert('Employee not found')
+      return
+    }
+
+    const { error } =
+        await supabase
+            .from('shift_requests')
+            .insert({
+              employee_id: currentEmployee.id,
+              type: 'swap_shift',
+              message: 'Requested shift swap'
+            })
+
+    console.log('SWAP ERROR', error)
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    alert('✅ Shift swap request sent')
+  } catch (error) {
+    console.error(error)
+  }
+}
 </script>
 
 <template>
@@ -467,13 +531,15 @@ snap-x snap-mandatory px-1"
     <!-- Actions -->
     <div class="grid grid-cols-2 gap-3">
       <button
+          @click="requestDayOff"
           class="glass-card rounded-[28px]
-        py-4 text-zinc-300"
+  py-4 text-zinc-300"
       >
         Day Off
       </button>
 
       <button
+          @click="requestShiftSwap"
           class="bg-gradient-to-r
         from-violet-600
         to-fuchsia-500
